@@ -19,7 +19,7 @@ void setup() {
 }
 
 void loop() {
-  if (volts(A4) > 3.5) {
+  if (volts(A4) > 1) {
     blinkLed();
     manouver(0,0,-1);
   }
