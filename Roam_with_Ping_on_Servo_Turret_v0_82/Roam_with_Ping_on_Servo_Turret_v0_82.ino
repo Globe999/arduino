@@ -121,7 +121,7 @@ void maneuver(int speedLeft, int speedRight)
  *             msTime - time to block code execution before another maneuver
  * Source:     http://learn.parallax.com/ManeuverFunction
  */ 
-void maneuver(int speedLeft, int speedRight, int msTime)
+void maneuver(int speedLeft, int speedRight, int ms)
 {
   speedLeft = constrain(speedLeft, -110, 110); //Old servo on right, can max be 110 to have straight path
   speedRight = constrain(speedRight, -200, 200);
@@ -334,4 +334,4 @@ int findIn(int value, int array[], int elements)
     if(value == array[i]) return i;
   }
   return -1;
-}  
+}
