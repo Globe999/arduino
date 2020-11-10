@@ -36,7 +36,7 @@ void setup()
   Serial.print("Angle to go: ");
   Serial.println(angle2go);
   delay(1000);
-  // doTurn(angle2go);
+  doTurn(angle2go);
 
 }
 
@@ -112,7 +112,7 @@ void turret(int degreeVal)
 
 void doTurn(int angle){
   float constant = 1100/90; //How many ms it takes for each degree turn
-  int inverted  = (angle < 90) ? true : false; //True if we turn to the left
+  int inverted  = (angle < 90) ? false : true; //True if we turn to the left
 
   if (inverted) {
     float ms = (angle - 90) * constant;
