@@ -33,6 +33,9 @@ void setup()
   scan();
   delay(1000);
   int angle2go = evalData();
+  Serial.println(angle2go);
+  // turn(angle2go);
+
 }
 
 void loop()
@@ -85,17 +88,18 @@ int evalData()
     }
     objSize[arrIndex][0] = j - i;
     //Median angle
-    objSize[arrIndex][1] = angles[i+(j-i)/2];
+    objSize[arrIndex][1] = angles[int(i+(j-i)/2)];
     arrIndex++;
+    i = j;
 
-    Serial.println(objArr[i]);
+    // Serial.println(objArr[i]);
   }
   int smallIndex = 0;
   for (int i = 0; i < arrSize; i++)
   {
     if(objSize[smallIndex] > objSize[i]) smallIndex = i;
   }
-  //Return angle of biggest object
+  //Return angle of smallest object
   return objSize[smallIndex][1];
 }
 
@@ -103,6 +107,21 @@ void turret(int degreeVal)
 {
   servoTurret.write(degreeVal);
 }
+
+void turn(int angle){
+  float constant = 1100/90; //How many ms it takes for each degree turn
+  int inverted  = (angle < 90) ? true : false; //True if we turn to the left
+
+  if (inverted) {
+    float ms = (angle - 90) * constant;
+    maneuver(50, -50, ms);
+  } else {
+    float ms = (90-angle) * constant;
+    maneuver(-50, 50, ms);
+  }
+
+}
+
 
 long ping(int pin)
 {
