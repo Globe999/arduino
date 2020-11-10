@@ -28,13 +28,15 @@ void setup()
     angles[i] = i + 20;
   }
 
-  turret(90); //Set turret to 90
-  delay(500);
+  turret(0); //Set turret to 90
+  delay(1000);
   scan();
   delay(1000);
   int angle2go = evalData();
+  Serial.print("Angle to go: ");
   Serial.println(angle2go);
-  // turn(angle2go);
+  delay(1000);
+  // doTurn(angle2go);
 
 }
 
@@ -66,7 +68,7 @@ void scan()
     distArr[i] = ping(pingPin);
 
     objArr[i] = (distArr[i] < 100) ? true : false;
-    delay(30);
+    delay(50);
   }
   turret(90);
 }
@@ -108,7 +110,7 @@ void turret(int degreeVal)
   servoTurret.write(degreeVal);
 }
 
-void turn(int angle){
+void doTurn(int angle){
   float constant = 1100/90; //How many ms it takes for each degree turn
   int inverted  = (angle < 90) ? true : false; //True if we turn to the left
 
