@@ -12,31 +12,33 @@ const int arrSize = 140;
 
 int angles[arrSize];
 int distArr[arrSize];
+bool objArr[arrSize];
 
-void setup() {
+void setup()
+{
   Serial.begin(9600);
   Serial.println("This is a test");
 
-  servoLeft.attach(servoLeftPin);                  // Attach left signal to pin 13
-  servoRight.attach(servoRightPin);                // Attach right signal to pin 12
+  servoLeft.attach(servoLeftPin);   // Attach left signal to pin 13
+  servoRight.attach(servoRightPin); // Attach right signal to pin 12
   servoTurret.attach(servoTurretPin);
 
-  for (int i = 0; i <= arrSize; i++) {
+  for (int i = 0; i <= arrSize; i++)
+  {
     angles[i] = i + 20;
   }
 
-  turret(90);                                       //Set turret to 90
+  turret(90); //Set turret to 90
   delay(500);
   scan();
-  evalData();
+  delay(1000);
+  int angle2go = evalData();
 }
 
-void loop() {
+void loop()
+{
   // put your main code here, to run repeatedly:
-
 }
-
-
 
 void maneuver(int speedLeft, int speedRight, int ms)
 {
@@ -44,45 +46,66 @@ void maneuver(int speedLeft, int speedRight, int ms)
   speedRight = constrain(speedRight, -200, 200);
   servoLeft.writeMicroseconds(1500 + speedLeft);
   servoRight.writeMicroseconds(1500 - speedRight);
-  if (ms == -1) {
+  if (ms == -1)
+  {
     servoLeft.detach();
     servoRight.detach();
   }
   delay(ms);
 }
 
-void scan() {
-  for (int i = 0; i < arrSize; i++) {
+void scan()
+{
+  for (int i = 0; i < arrSize; i++)
+  {
     turret(angles[i]);
+    delay(5);
     distArr[i] = ping(pingPin);
-    delay(50);
+
+    objArr[i] = (distArr[i] < 100) ? true : false;
+    delay(30);
   }
   turret(90);
 }
 
 //Evaluates distances to analyze objects
-void evalData() {
-  int arrFound[arrSize];
-  int iStart, iEnd;
-  for (int i = 0; i < arrSize - 1; i++) {
-    //check if it's less than 5cm difference, treat as same object.
-    if ((distArr[i] < distArr[i-1]-5) || distArr[i] > distArr[i-1]+5) continue;
-    if (!iStart) {
-      //shorter distance to object!
-      if (distArr[i] < distArr[i - 1]) {
-        iStart = i
-                 //closer object found, start recording
-                 //arrFound[];
-      }
+int evalData()
+{
+  int objSize[arrSize][2];
+  int arrIndex = 0;
+  for (int i = 0; i < arrSize; i++)
+  {
+    if (!objArr[i])
+    {
+      continue;
     }
+    int j = i;
+    while (objArr[j]){
+      j++;
+    }
+    objSize[arrIndex][0] = j - i;
+    //Median angle
+    objSize[arrIndex][1] = angles[i+(j-i)/2];
+    arrIndex++;
+
+    Serial.println(objArr[i]);
   }
+  int smallIndex = 0;
+  for (int i = 0; i < arrSize; i++)
+  {
+    if(objSize[smallIndex] > objSize[i]) smallIndex = i;
+  }
+  //Return angle of biggest object
+  return objSize[smallIndex][1];
 }
 
-void turret(int degreeVal) {
+void turret(int degreeVal)
+{
   servoTurret.write(degreeVal);
 }
 
-long ping(int pin) {
+long ping(int pin)
+{
   long duration, cm;
 
   pinMode(pin, OUTPUT);
@@ -102,6 +125,7 @@ long ping(int pin) {
   return cm;
 }
 
-long microsecondsToCentimeters(long microseconds) {
+long microsecondsToCentimeters(long microseconds)
+{
   return microseconds / (29 * 2);
 }
