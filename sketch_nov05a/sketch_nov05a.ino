@@ -37,6 +37,10 @@ void setup()
   Serial.println(angle2go);
   delay(1000);
   doTurn(angle2go);
+  delay(1000);
+  while (ping(pingPin) > 10) {
+    maneuver(200, 200, 1)
+  }
 
 }
 
