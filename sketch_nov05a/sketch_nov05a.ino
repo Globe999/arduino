@@ -71,7 +71,7 @@ void scan()
     delay(5);
     distArr[i] = ping(pingPin);
 
-    objArr[i] = (distArr[i] < 100) ? true : false;
+    objArr[i] = (distArr[i] < 120) ? true : false;
     delay(50);
   }
   turret(90);
