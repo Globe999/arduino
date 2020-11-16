@@ -12,7 +12,6 @@ const int arrSize = 140;
 
 int angles[arrSize];
 int distArr[arrSize];
-bool objArr[arrSize];
 
 void setup()
 {
@@ -36,12 +35,11 @@ void setup()
   Serial.print("Angle to go: ");
   Serial.println(angle2go);
   delay(1000);
-  // doTurn(angle2go);
-  // delay(1000);
+  test(angle2go);
+  delay(1000);
   // while (ping(pingPin) > 10) {
   //   maneuver(200, 200, 1);
   // }
-
 }
 
 void loop()
@@ -70,8 +68,6 @@ void scan()
     turret(angles[i]);
     delay(5);
     distArr[i] = ping(pingPin);
-
-    objArr[i] = (distArr[i] < 120) ? true : false;
     delay(50);
   }
   turret(90);
@@ -84,29 +80,37 @@ int evalData()
   int arrIndex = 0;
   for (int i = 0; i < arrSize; i++)
   {
-    if (!objArr[i])
+    if (distArr[i] > 120)
     {
       continue;
     }
     int j = i;
-    while (objArr[j]){
+    while (distArr[j] <= 120)
+    {
       j++;
     }
     objSize[arrIndex][0] = j - i;
+    Serial.print("Size: ");
+    Serial.println(objSize[arrIndex][0]);
     //Median angle
-    objSize[arrIndex][1] = angles[int(i+(j-i)/2)];
+    objSize[arrIndex][1] = angles[i + ((j - i) / 2)];
+    Serial.print("Angle: ");
+    Serial.println(objSize[arrIndex][1]);
     arrIndex++;
-    i = j;
-
-    // Serial.println(objArr[i]);
+    //Skip to next section
+    i = j + 1;
   }
-  int smallIndex = 0;
-  for (int i = 0; i < arrSize; i++)
+  int smallest = objSize[0][0];
+  int angle = objSize[0][1];
+  for (int i = 0; i < arrIndex; i++)
   {
-    if(objSize[smallIndex] > objSize[i]) smallIndex = i;
+    if (smallest > objSize[i][0])
+    {
+      smallest = objSize[i][0];
+      angle = objSize[i][1];
+    }
   }
-  //Return angle of smallest object
-  return objSize[smallIndex][1];
+  return angle;
 }
 
 void turret(int degreeVal)
@@ -114,20 +118,19 @@ void turret(int degreeVal)
   servoTurret.write(degreeVal);
 }
 
-void doTurn(int angle){
-  float constant = 1100/90; //How many ms it takes for each degree turn
-  int inverted  = (angle < 90) ? false : true; //True if we turn to the left
-
-  if (inverted) {
-    float ms = (angle - 90) * constant;
-    maneuver(50, -50, ms);
-  } else {
-    float ms = (90-angle) * constant;
-    maneuver(-50, 50, ms);
+void test(int angle)
+{
+  float constant = 1100 / 90;                 //How many ms it takes for each degree turn
+  if (angle < 90) 
+  {
+    servoLeft.writeMicroseconds(1550);
+    servoRight.writeMicroseconds(1550);
+  } else
+  {
+    servoLeft.writeMicroseconds(1450);
+    servoRight.writeMicroseconds(1450);
   }
-
 }
-
 
 long ping(int pin)
 {

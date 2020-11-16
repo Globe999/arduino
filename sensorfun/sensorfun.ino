@@ -85,8 +85,8 @@ long ping(int pin) {
   duration = pulseIn(pin, HIGH);
 
   cm = microsecondsToCentimeters(duration);
-  Serial.print(cm);
-  Serial.println("cm");
+  // Serial.print(cm);
+  // Serial.println("cm");
   return cm;
 }
 
