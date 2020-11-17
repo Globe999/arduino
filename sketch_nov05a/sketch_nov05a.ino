@@ -9,8 +9,6 @@ const int servoRightPin = 12;
 const int servoTurretPin = 11;
 const int pingPin = 10;
 const int arrSize = 140;
-
-int angles[arrSize];
 int distArr[arrSize];
 
 void setup()
@@ -22,14 +20,16 @@ void setup()
   servoRight.attach(servoRightPin); // Attach right signal to pin 12
   servoTurret.attach(servoTurretPin);
 
-  for (int i = 0; i <= arrSize; i++)
-  {
-    angles[i] = i + 20;
-  }
+  doStuff();
+}
 
+void doStuff()
+{
   turret(0); //Set turret to 90
   delay(1000);
   scan();
+  turret(50);
+
   delay(1000);
   int angle2go = evalData();
   Serial.print("Angle to go: ");
@@ -37,11 +37,11 @@ void setup()
   delay(1000);
   test(angle2go);
   delay(1000);
-  // while (ping(pingPin) > 10) {
-  //   maneuver(200, 200, 1);
-  // }
+  while (ping(pingPin) > 10)
+  {
+    maneuver(200, 200, 1);
+  }
 }
-
 void loop()
 {
   // put your main code here, to run repeatedly:
@@ -63,12 +63,14 @@ void maneuver(int speedLeft, int speedRight, int ms)
 
 void scan()
 {
-  for (int i = 0; i < arrSize; i++)
+  int i = 0;
+  while (i <= 140)
   {
-    turret(angles[i]);
+    turret(i + 20);
     delay(5);
     distArr[i] = ping(pingPin);
     delay(50);
+    i++;
   }
   turret(90);
 }
@@ -93,7 +95,7 @@ int evalData()
     Serial.print("Size: ");
     Serial.println(objSize[arrIndex][0]);
     //Median angle
-    objSize[arrIndex][1] = angles[i + ((j - i) / 2)];
+    objSize[arrIndex][1] = i + ((j - i) / 2) + 20;
     Serial.print("Angle: ");
     Serial.println(objSize[arrIndex][1]);
     arrIndex++;
@@ -120,15 +122,16 @@ void turret(int degreeVal)
 
 void test(int angle)
 {
-  float constant = 1100 / 90;                 //How many ms it takes for each degree turn
-  if (angle < 90) 
+  float constant = 1100 / 90; //How many ms it takes for each degree turn
+  if (angle < 90)
   {
-    servoLeft.writeMicroseconds(1550);
-    servoRight.writeMicroseconds(1550);
-  } else
+    // servoLeft.writeMicroseconds(1550);
+    // servoRight.writeMicroseconds(1550);
+  }
+  else
   {
-    servoLeft.writeMicroseconds(1450);
-    servoRight.writeMicroseconds(1450);
+    // servoLeft.writeMicroseconds(1450);
+    // servoRight.writeMicroseconds(1450);
   }
 }
 
