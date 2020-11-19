@@ -19,36 +19,49 @@ void setup()
   servoLeft.attach(servoLeftPin);   // Attach left signal to pin 13
   servoRight.attach(servoRightPin); // Attach right signal to pin 12
   servoTurret.attach(servoTurretPin);
-
-  doStuff();
-}
-
-void doStuff()
-{
+  
   turret(0); //Set turret to 90
   delay(1000);
   scan();
-  turret(50);
+  turret(90);
 
   delay(1000);
   int angle2go = evalData();
   Serial.print("Angle to go: ");
   Serial.println(angle2go);
   delay(1000);
-  test(angle2go);
+
+  turn(angle2go);
+  Serial.println("Here!");
+  stopManeuver();
   delay(1000);
-  while (ping(pingPin) > 10)
-  {
-    maneuver(200, 200, 1);
-  }
+
+  goToTarget();
+  // servoLeft.writeMicroseconds(1500);
+  // servoRight.writeMicroseconds(1500);
 }
 void loop()
 {
   // put your main code here, to run repeatedly:
 }
 
+void goToTarget(){
+  maneuver(200,200,10);
+}
+void stopManeuver()
+{
+  servoLeft.writeMicroseconds(1500);
+  servoRight.writeMicroseconds(1500);
+}
+void attachServos()
+{
+  servoLeft.attach(servoLeftPin);
+  servoRight.attach(servoRightPin);
+}
 void maneuver(int speedLeft, int speedRight, int ms)
 {
+  servoLeft.attach(servoLeftPin); // Attach left signal to pin 13
+  servoRight.attach(servoRightPin);
   speedLeft = constrain(speedLeft, -110, 110); //Old servo on right, can max be 110 to have straight path
   speedRight = constrain(speedRight, -200, 200);
   servoLeft.writeMicroseconds(1500 + speedLeft);
@@ -120,19 +133,20 @@ void turret(int degreeVal)
   servoTurret.write(degreeVal);
 }
 
-void test(int angle)
+void turn(int angle)
 {
   float constant = 1100 / 90; //How many ms it takes for each degree turn
   if (angle < 90)
   {
-    // servoLeft.writeMicroseconds(1550);
-    // servoRight.writeMicroseconds(1550);
+    int ms = int((90 - angle) * constant);
+    maneuver(50,-50,ms);
   }
   else
   {
-    // servoLeft.writeMicroseconds(1450);
-    // servoRight.writeMicroseconds(1450);
+    int ms = int((angle - 90) * constant);
+    maneuver(-50,50,ms);
   }
+  Serial.println("Done");
 }
 
 long ping(int pin)
