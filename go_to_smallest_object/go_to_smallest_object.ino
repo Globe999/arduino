@@ -33,31 +33,20 @@ void setup()
 
   turn(angle2go);
   Serial.println("Here!");
-  stopManeuver();
-  delay(1000);
 
-  goToTarget();
-  // servoLeft.writeMicroseconds(1500);
-  // servoRight.writeMicroseconds(1500);
+  maneuver(200,200,1);
+  while(ping(pingPin)>5){
+    maneuver(200,200,5);
+  }
+  servoRight.detach();
+  servoLeft.detach();
+
 }
 void loop()
 {
   // put your main code here, to run repeatedly:
 }
 
-void goToTarget(){
-  maneuver(200,200,10);
-}
-void stopManeuver()
-{
-  servoLeft.writeMicroseconds(1500);
-  servoRight.writeMicroseconds(1500);
-}
-void attachServos()
-{
-  servoLeft.attach(servoLeftPin);
-  servoRight.attach(servoRightPin);
-}
 void maneuver(int speedLeft, int speedRight, int ms)
 {
   servoLeft.attach(servoLeftPin); // Attach left signal to pin 13
@@ -77,7 +66,7 @@ void maneuver(int speedLeft, int speedRight, int ms)
 void scan()
 {
   int i = 0;
-  while (i <= 140)
+  while (i < 140)
   {
     turret(i + 20);
     delay(5);
@@ -138,12 +127,12 @@ void turn(int angle)
   float constant = 1100 / 90; //How many ms it takes for each degree turn
   if (angle < 90)
   {
-    int ms = int((90 - angle) * constant);
+    int ms = (90 - angle) * constant;
     maneuver(50,-50,ms);
   }
   else
   {
-    int ms = int((angle - 90) * constant);
+    int ms = (angle - 90) * constant;
     maneuver(-50,50,ms);
   }
   Serial.println("Done");
